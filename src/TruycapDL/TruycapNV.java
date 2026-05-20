@@ -1,11 +1,10 @@
 package TruycapDL;
 
 import config.DBConnection;
-import model.Nhanvien;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import model.Nhanvien;
 
 public class TruycapNV {
 
@@ -69,9 +68,9 @@ public class TruycapNV {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, nv.getMaNV());
-            ps.setString(2, nv.getHoten());
+            ps.setString(2, nv.gethoten());
             ps.setString(3, nv.getSDT());
-            ps.setString(4, nv.getDiachi());
+            ps.setString(4, nv.getdiachi());
             ps.setDouble(5, nv.getLuong());
             ps.setString(6, nv.getEmail());
             ps.setDate(7, nv.getNgaysinh() != null ? Date.valueOf(nv.getNgaysinh()) : null);
@@ -90,9 +89,9 @@ public class TruycapNV {
                    + "Ngaysinh=?, Gioitinh=?, Taikhoan=?, Matkhau=?, Vaitro=? WHERE maNV=?";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, nv.getHoten());
+            ps.setString(1, nv.gethoten());
             ps.setString(2, nv.getSDT());
-            ps.setString(3, nv.getDiachi());
+            ps.setString(3, nv.getdiachi());
             ps.setDouble(4, nv.getLuong());
             ps.setString(5, nv.getEmail());
             ps.setDate(6, nv.getNgaysinh() != null ? Date.valueOf(nv.getNgaysinh()) : null);

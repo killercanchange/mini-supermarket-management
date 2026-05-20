@@ -37,14 +37,14 @@ public class Nhanvien {
     public String getMaNV() { return maNV; }
     public void setMaNV(String maNV) { this.maNV = maNV; }
 
-    public String getHoten() { return hoten; }
-    public void setHoten(String hoten) { this.hoten = hoten; }
+    public String gethoten() { return hoten; }
+    public void sethoten(String hoten) { this.hoten = hoten; }
 
     public String getSDT() { return SDT; }
     public void setSDT(String SDT) { this.SDT = SDT; }
 
-    public String getDiachi() { return diachi; }
-    public void setDiachi(String diachi) { this.diachi = diachi; }
+    public String getdiachi() { return diachi; }
+    public void setdiachi(String diachi) { this.diachi = diachi; }
 
     public double getLuong() { return luong; }
     public void setLuong(double luong) { this.luong = luong; }
