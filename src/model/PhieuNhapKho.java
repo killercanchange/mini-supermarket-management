@@ -4,69 +4,120 @@ import java.time.LocalDate;
 
 public class PhieuNhapKho {
 
-    private String maPN;
-    private String maNV; // Mã nhân viên lập phiếu nhập
-    private String maNCC; // Mã nhà cung cấp
+    private String maPhieuNhap;
+    private String maNCC;
+    private String tenNCC;
+    private String maSP;
+    private String tenSP;
+    private int soLuongNhap;
+    private double giaNhap;
     private LocalDate ngayNhap;
-    private double tongTien; // Tổng giá trị của lô hàng nhập vào
-    private String trangThai; // Ví dụ: "Hoàn thành", "Chờ duyệt", "Đã hủy"
-    private String ghiChu;
 
     // Constructor rỗng
-    public PhieuNhapKho() {}
+    public PhieuNhapKho() {
+    }
 
     // Constructor đầy đủ
-    public PhieuNhapKho(String maPN, String maNV, String maNCC, LocalDate ngayNhap, 
-                     double tongTien, String trangThai, String ghiChu) {
-        this.maPN = maPN;
-        this.maNV = maNV;
+    public PhieuNhapKho(String maPhieuNhap, String maNCC, String tenNCC,
+                        String maSP, String tenSP,
+                        int soLuongNhap, double giaNhap,
+                        LocalDate ngayNhap) {
+
+        this.maPhieuNhap = maPhieuNhap;
         this.maNCC = maNCC;
+        this.tenNCC = tenNCC;
+        this.maSP = maSP;
+        this.tenSP = tenSP;
+        this.soLuongNhap = soLuongNhap;
+        this.giaNhap = giaNhap;
         this.ngayNhap = ngayNhap;
-        this.tongTien = tongTien;
-        this.trangThai = trangThai;
-        this.ghiChu = ghiChu;
     }
 
     // GETTER & SETTER
 
-    public String getMaPN() { return maPN; }
-    public void setMaPN(String maPN) { this.maPN = maPN; }
-
-    public String getMaNV() { return maNV; }
-    public void setMaNV(String maNV) { this.maNV = maNV; }
-
-    public String getMaNCC() { return maNCC; }
-    public void setMaNCC(String maNCC) { this.maNCC = maNCC; }
-
-    public LocalDate getNgayNhap() { return ngayNhap; }
-    public void setNgayNhap(LocalDate ngayNhap) { this.ngayNhap = ngayNhap; }
-
-    public double getTongTien() { return tongTien; }
-    public void setTongTien(double tongTien) { this.tongTien = tongTien; }
-
-    public String getTrangThai() { return trangThai; }
-    public void setTrangThai(String trangThai) { this.trangThai = trangThai; }
-
-    public String getGhiChu() { return ghiChu; }
-    public void setGhiChu(String ghiChu) { this.ghiChu = ghiChu; }
-
-    // PHƯƠNG THỨC TIỆN ÍCH 
-
-    // Kiểm tra xem phiếu nhập đã hoàn thành hay chưa
-    public boolean isHoanThanh() {
-        return "Hoàn thành".equalsIgnoreCase(this.trangThai) || 
-               "Hoan thanh".equalsIgnoreCase(this.trangThai);
+    public String getMaPhieuNhap() {
+        return maPhieuNhap;
     }
+
+    public void setMaPhieuNhap(String maPhieuNhap) {
+        this.maPhieuNhap = maPhieuNhap;
+    }
+
+    public String getMaNCC() {
+        return maNCC;
+    }
+
+    public void setMaNCC(String maNCC) {
+        this.maNCC = maNCC;
+    }
+
+    public String getTenNCC() {
+        return tenNCC;
+    }
+
+    public void setTenNCC(String tenNCC) {
+        this.tenNCC = tenNCC;
+    }
+
+    public String getMaSP() {
+        return maSP;
+    }
+
+    public void setMaSP(String maSP) {
+        this.maSP = maSP;
+    }
+
+    public String getTenSP() {
+        return tenSP;
+    }
+
+    public void setTenSP(String tenSP) {
+        this.tenSP = tenSP;
+    }
+
+    public int getSoLuongNhap() {
+        return soLuongNhap;
+    }
+
+    public void setSoLuongNhap(int soLuongNhap) {
+        this.soLuongNhap = soLuongNhap;
+    }
+
+    public double getGiaNhap() {
+        return giaNhap;
+    }
+
+    public void setGiaNhap(double giaNhap) {
+        this.giaNhap = giaNhap;
+    }
+
+    public LocalDate getNgayNhap() {
+        return ngayNhap;
+    }
+
+    public void setNgayNhap(LocalDate ngayNhap) {
+        this.ngayNhap = ngayNhap;
+    }
+
+    // Tính tổng tiền nhập
+
+    public double tinhTongTien() {
+        return soLuongNhap * giaNhap;
+    }
+
+    // toString()
 
     @Override
     public String toString() {
-        return "PhieuNhap{" +
-                "maPN='" + maPN + '\'' +
-                ", maNV='" + maNV + '\'' +
+        return "PhieuNhapKho{" +
+                "maPhieuNhap='" + maPhieuNhap + '\'' +
                 ", maNCC='" + maNCC + '\'' +
+                ", tenNCC='" + tenNCC + '\'' +
+                ", maSP='" + maSP + '\'' +
+                ", tenSP='" + tenSP + '\'' +
+                ", soLuongNhap=" + soLuongNhap +
+                ", giaNhap=" + giaNhap +
                 ", ngayNhap=" + ngayNhap +
-                ", tongTien=" + tongTien +
-                ", trangThai='" + trangThai + '\'' +
                 '}';
     }
 }
