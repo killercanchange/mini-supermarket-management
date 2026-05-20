@@ -16,9 +16,7 @@ public class Nhanvien {
     private String Matkhau;
     private String Vaitro;
 
-
     public Nhanvien() {}
-
 
     public Nhanvien(String maNV, String hoten, String SDT, String diachi,
                     double luong, String email, LocalDate Ngaysinh, String Gioitinh,
@@ -36,18 +34,17 @@ public class Nhanvien {
         this.Vaitro = Vaitro;
     }
 
-
     public String getMaNV() { return maNV; }
     public void setMaNV(String maNV) { this.maNV = maNV; }
 
-    public String getHoTen() { return hoten; }
-    public void setHoTen(String hoten) { this.hoten = hoten; }
+    public String getHoten() { return hoten; }
+    public void setHoten(String hoten) { this.hoten = hoten; }
 
-    public String getSoDienThoai() { return SDT; }
-    public void setSoDienThoai(String SDT) { this.SDT = SDT; }
+    public String getSDT() { return SDT; }
+    public void setSDT(String SDT) { this.SDT = SDT; }
 
-    public String getDiaChi() { return diachi; }
-    public void setDiaChi(String diachi) { this.diachi = diachi; }
+    public String getDiachi() { return diachi; }
+    public void setDiachi(String diachi) { this.diachi = diachi; }
 
     public double getLuong() { return luong; }
     public void setLuong(double luong) { this.luong = luong; }
@@ -55,22 +52,20 @@ public class Nhanvien {
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
-    public LocalDate getNgaySinh() { return Ngaysinh; }
-    public void setNgaySinh(LocalDate Ngaysinh) { this.Ngaysinh = Ngaysinh; }
+    public LocalDate getNgaysinh() { return Ngaysinh; }
+    public void setNgaysinh(LocalDate Ngaysinh) { this.Ngaysinh = Ngaysinh; }
 
-    public String getGioiTinh() { return Gioitinh; }
-    public void setGioiTinh(String Gioitinh) { this.Gioitinh = Gioitinh; }
+    public String getGioitinh() { return Gioitinh; }
+    public void setGioitinh(String Gioitinh) { this.Gioitinh = Gioitinh; }
 
-    public String getTaiKhoan() { return Taikhoan; }
-    public void setTaiKhoan(String Taikhoan) { this.Taikhoan = Taikhoan; }
+    public String getTaikhoan() { return Taikhoan; }
+    public void setTaikhoan(String Taikhoan) { this.Taikhoan = Taikhoan; }
 
-    public String getMatKhau() { return Matkhau; }
-    public void setMatKhau(String Matkhau) { this.Matkhau = Matkhau; }
+    public String getMatkhau() { return Matkhau; }
+    public void setMatkhau(String Matkhau) { this.Matkhau = Matkhau; }
 
-    public String getVaiTro() { return Vaitro; }
-    public void setVaiTro(String Vaitro) { this.Vaitro = Vaitro; }
-
-    //  PHƯƠNG THỨC TIỆN ÍCH 
+    public String getVaitro() { return Vaitro; }
+    public void setVaitro(String Vaitro) { this.Vaitro = Vaitro; }
 
     public boolean isAdmin() {
         return "admin".equalsIgnoreCase(this.Vaitro);
@@ -80,10 +75,10 @@ public class Nhanvien {
     public String toString() {
         return "Nhanvien{" +
                 "maNV='" + maNV + '\'' +
-                ", hoTen='" + hoten + '\'' +
-                ", soDienThoai='" + SDT + '\'' +
+                ", hoten='" + hoten + '\'' +
+                ", SDT='" + SDT + '\'' +
                 ", email='" + email + '\'' +
-                ", vaiTro='" + Vaitro + '\'' +
+                ", Vaitro='" + Vaitro + '\'' +
                 '}';
     }
 }
