@@ -1,5 +1,5 @@
-package vỉew;
+package view;
 
-public class QuanLyNV {
+public class QuanLyNhanVien {
     
 }

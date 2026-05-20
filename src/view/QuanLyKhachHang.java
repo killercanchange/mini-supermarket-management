@@ -1,16 +1,15 @@
 package view;
 
 import TruycapDL.TruycapKH;
-import model.KhachHang;
-
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import model.KhachHang;
 
 public class QuanLyKhachHang extends JFrame {
 
@@ -33,9 +32,9 @@ public class QuanLyKhachHang extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(10, 10));
 
-        // =========================================================
+
         // 1. VÙNG NHẬP LIỆU (NORTH)
-        // =========================================================
+      
         JPanel pnlNorth = new JPanel(new BorderLayout(5, 5));
         pnlNorth.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 10));
 
