@@ -14,12 +14,12 @@ public class Nhanvien {
     private String Gioitinh;
     private String Taikhoan;
     private String Matkhau;
-    private String Vaitro; // "admin" hoặc "nhanvien"
+    private String Vaitro;
 
-    // Constructor rỗng
+
     public Nhanvien() {}
 
-    // Constructor đầy đủ
+
     public Nhanvien(String maNV, String hoten, String SDT, String diachi,
                     double luong, String email, LocalDate Ngaysinh, String Gioitinh,
                     String Taikhoan, String Matkhau, String Vaitro) {
@@ -36,7 +36,6 @@ public class Nhanvien {
         this.Vaitro = Vaitro;
     }
 
-    //  GETTER & SETTER
 
     public String getMaNV() { return maNV; }
     public void setMaNV(String maNV) { this.maNV = maNV; }
