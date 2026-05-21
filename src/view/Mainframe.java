@@ -7,18 +7,41 @@ import java.time.format.DateTimeFormatter;
 
 public class Mainframe extends JFrame {
 
-    private JLabel lblXinChao, lblDongHo;
+    private JLabel lblXinChao, lblDongHo, lblStatus;
     private JButton btnQLSanPham, btnQLKhachHang, btnQLNhanVien, btnQLHoaDon, btnQLKho, btnQLNhaCungCap, btnDangXuat;
+    
+    // Biến lưu trữ vai trò để đồng bộ trong suốt phiên làm việc
+    private String vaiTroNguoiDung; 
 
-    public Mainframe() {
+    // Hàm khởi tạo nhận thông tin từ màn hình Login truyền sang
+    public Mainframe(String taiKhoan, String vaiTro) {
+        this.vaiTroNguoiDung = vaiTro;
         initComponents();
-        startClock(); // Chạy đồng hồ hiển thị thời gian thực hệ thống
+        startClock(); // Khởi chạy đồng hồ thời gian thực
+        
+        // Cập nhật thông tin chào mừng hiển thị góc phải
+        lblXinChao.setText("Xin chào, " + taiKhoan + " [" + vaiTro + "]");
+        
+        // CƠ CHẾ PHÂN QUYỀN ĐỒNG BỘ:
+        if (vaiTro.equalsIgnoreCase("Nhân viên")) {
+            // Khóa tất cả các quyền quản trị, chỉ giữ lại Quản lý sản phẩm
+            btnQLKhachHang.setEnabled(false);
+            btnQLNhanVien.setEnabled(false);
+            btnQLHoaDon.setEnabled(false);
+            btnQLKho.setEnabled(false);
+            btnQLNhaCungCap.setEnabled(false);
+            
+            // Đổi thông báo trạng thái phía dưới thanh trạng thái
+            lblStatus.setText("Trạng thái: Tài khoản Nhân viên (Hạn chế quyền truy cập).");
+        } else {
+            lblStatus.setText("Trạng thái: Đang kết nối cơ sở dữ liệu với quyền Quản lý.");
+        }
     }
 
     private void initComponents() {
         setTitle("Hệ Thống Quản Lý Cửa Hàng & Kho Tổng Hợp");
         setSize(1050, 650);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Tắt màn hình chính sẽ dừng toàn bộ chương trình
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Đóng mainframe sẽ tắt toàn bộ app
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
@@ -26,7 +49,7 @@ public class Mainframe extends JFrame {
         // 1. THANH TIÊU ĐỀ TRÊN CÙNG (NORTH)
         // =========================================================
         JPanel pnlHeader = new JPanel(new BorderLayout());
-        pnlHeader.setBackground(new Color(41, 128, 185)); // Xanh đậm phong cách phẳng (Flat design)
+        pnlHeader.setBackground(new Color(41, 128, 185)); // Xanh đậm Flat design
         pnlHeader.setBorder(BorderFactory.createEmptyBorder(15, 25, 15, 25));
 
         JLabel lblTitle = new JLabel("HỆ THỐNG QUẢN LÝ CỬA HÀNG");
@@ -34,7 +57,7 @@ public class Mainframe extends JFrame {
         lblTitle.setForeground(Color.WHITE);
         pnlHeader.add(lblTitle, BorderLayout.WEST);
 
-        // Góc phải chứa thông tin tài khoản & đồng hồ thời gian thực
+        // Góc phải chứa thông tin tài khoản & đồng hồ
         JPanel pnlHeaderRight = new JPanel(new GridLayout(2, 1));
         pnlHeaderRight.setOpaque(false);
         
@@ -44,7 +67,7 @@ public class Mainframe extends JFrame {
         
         lblDongHo = new JLabel("00:00:00 - 01/01/2026", SwingConstants.RIGHT);
         lblDongHo.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        lblDongHo.setForeground(new Color(241, 196, 15)); // Chữ màu vàng nổi bật
+        lblDongHo.setForeground(new Color(241, 196, 15)); // Màu vàng nổi bật
         
         pnlHeaderRight.add(lblXinChao);
         pnlHeaderRight.add(lblDongHo);
@@ -55,7 +78,6 @@ public class Mainframe extends JFrame {
         // =========================================================
         // 2. KHU VỰC BẢNG ĐIỀU KHIỂN CHỨC NĂNG CHÍNH (CENTER)
         // =========================================================
-        // Thiết lập dạng Grid 2 hàng 3 cột để phân bổ đều 6 nút quản lý tương ứng với 6 file của bạn
         JPanel pnlMenu = new JPanel(new GridLayout(2, 3, 20, 20));
         pnlMenu.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
@@ -92,7 +114,7 @@ public class Mainframe extends JFrame {
         pnlFooter.setBorder(BorderFactory.createEmptyBorder(10, 25, 10, 25));
         pnlFooter.setBackground(new Color(236, 240, 241));
 
-        JLabel lblStatus = new JLabel("Trạng thái: Đang kết nối cơ sở dữ liệu ổn định.");
+        lblStatus = new JLabel("Trạng thái: Đang kết nối cơ sở dữ liệu ổn định.");
         lblStatus.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lblStatus.setForeground(new Color(127, 140, 141));
         pnlFooter.add(lblStatus, BorderLayout.WEST);
@@ -106,56 +128,25 @@ public class Mainframe extends JFrame {
         // =========================================================
         // XỬ LÝ SỰ KIỆN ĐIỀU HƯỚNG MỞ CỬA SỔ (LISTENERS)
         // =========================================================
+        btnQLSanPham.addActionListener(e -> new QuanLySanPham().setVisible(true));
+        btnQLKhachHang.addActionListener(e -> new QuanLyKhachHang().setVisible(true));
+        btnQLNhanVien.addActionListener(e -> new QuanLyNhanVien().setVisible(true));
+        btnQLHoaDon.addActionListener(e -> new QuanLyHoaDon().setVisible(true));
+        btnQLKho.addActionListener(e -> new QuanLyKho().setVisible(true));
+        btnQLNhaCungCap.addActionListener(e -> new QuanLyNhaCungCap().setVisible(true));
 
-        // 1. Mở Quản Lý Sản Phẩm
-        btnQLSanPham.addActionListener(e -> {
-            new QuanLySanPham().setVisible(true);
-        });
-
-        // 2. Mở Quản Lý Khách Hàng
-        btnQLKhachHang.addActionListener(e -> {
-            new QuanLyKhachHang().setVisible(true);
-        });
-
-        // 3. Mở Quản Lý Nhân Viên (Gọi class QuanLyNV tương ứng với khai báo bên trong file của bạn)
-        btnQLNhanVien.addActionListener(e -> {
-            // Lưu ý: File của bạn tên QuanLyNhanVien.java nhưng bên trong khai báo class QuanLyNV công khai
-            new QuanLyNhanVien().setVisible(true); 
-        });
-
-        // 4. Mở Quản Lý Hóa Đơn (Mở giao diện khi bạn viết code hoàn chỉnh sau này)
-        btnQLHoaDon.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "Tính năng Quản Lý Hóa Đơn đang được xây dựng!");
-            // new QuanLyHoaDon().setVisible(true);
-        });
-
-        // 5. Mở Quản Lý Kho
-        btnQLKho.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "Tính năng Quản Lý Kho đang được xây dựng!");
-            // new QuanLyKho().setVisible(true);
-        });
-
-        // 6. Mở Quản Lý Nhà Cung Cấp
-        btnQLNhaCungCap.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "Tính năng Quản Lý Nhà Cung Cấp đang được xây dựng!");
-            // new QuanLyNhaCungCap().setVisible(true);
-        });
-
-        // Xử lý sự kiện nút Đăng xuất
+        // Nút Đăng xuất quay về Login
         btnDangXuat.addActionListener(e -> {
             int confirm = JOptionPane.showConfirmDialog(this, 
                     "Bạn có muốn thoát phiên làm việc của tài khoản này?", 
                     "Xác nhận đăng xuất", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
                 this.dispose(); // Đóng màn hình chính
-                System.out.println("Đã đăng xuất thành công.");
+                new Login().setVisible(true); // Trở về giao diện Login
             }
         });
     }
 
-    /**
-     * Hàm thiết kế nhanh khối nút bấm điều hướng (Dashboard Card Button)
-     */
     private JButton createMenuButton(String title, String subTitle, Color themeColor) {
         JButton button = new JButton();
         button.setLayout(new BorderLayout());
@@ -167,28 +158,21 @@ public class Mainframe extends JFrame {
                 BorderFactory.createEmptyBorder(25, 20, 25, 20)
         ));
 
-        // Tên nghiệp vụ lớn ở trung tâm nút
         JLabel lblBtnTitle = new JLabel(title, SwingConstants.CENTER);
         lblBtnTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
         lblBtnTitle.setForeground(Color.WHITE);
 
-        // Mô tả chức năng nhỏ ở cạnh đáy nút
         JLabel lblBtnSub = new JLabel(subTitle, SwingConstants.CENTER);
         lblBtnSub.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lblBtnSub.setForeground(new Color(245, 245, 245));
 
         button.add(lblBtnTitle, BorderLayout.CENTER);
         button.add(lblBtnSub, BorderLayout.SOUTH);
-
-        // Đổi hình con trỏ chuột thành hình bàn tay khi rê vào nút bấm
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
         return button;
     }
 
-    /**
-     * Khởi chạy bộ đếm thời gian hệ thống thực tế chạy liên tục mỗi giây
-     */
     private void startClock() {
         Timer timer = new Timer(1000, e -> {
             LocalDateTime now = LocalDateTime.now();
@@ -199,7 +183,8 @@ public class Mainframe extends JFrame {
     }
 
     public static void main(String[] args) {
-        // Đồng bộ phong cách Nimbus giúp nút và bảng hiển thị mượt mà, phẳng hóa hiện đại
+        // Mặc định chạy ứng dụng từ màn hình Đăng nhập (Login), 
+        // Hàm main này chỉ dùng để test giao diện nhanh nếu cần.
         try {
             for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -207,8 +192,8 @@ public class Mainframe extends JFrame {
                     break;
                 }
             }
-        } catch (Exception e) { /** Fallback default UI */ }
+        } catch (Exception e) { /** Fallback */ }
 
-        SwingUtilities.invokeLater(() -> new Mainframe().setVisible(true));
+        SwingUtilities.invokeLater(() -> new Mainframe("Quản trị viên", "Quản lý").setVisible(true));
     }
 }

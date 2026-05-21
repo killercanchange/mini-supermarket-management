@@ -21,9 +21,7 @@ public class KhachHang {
         this.SDT = SDT;
         this.Ngaysinh = Ngaysinh;
         this.diachi = diachi;
-    }
-
-    // GETTER & SETTER 
+    } 
 
     public String getMaKH() { return maKH; }
     public void setMaKH(String maKH) { this.maKH = maKH; }

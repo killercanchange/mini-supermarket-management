@@ -1,5 +1,3 @@
-// code kiểm tra kết nối CSDL, thêm sửa xóa nhân viên, thêm sửa xóa sản phẩm, hiển thị danh sách nhân viên, hiển thị danh sách sản phẩm
-
 package controller;
 
 import TruycapDL.TruycapHoaDon;
@@ -11,10 +9,11 @@ import model.Sanpham;
 
 public class Salecontroller {
 
-private final TruycapHoaDon truycapHD = new TruycapHoaDon();
-private final TruycapSP truycapSP = new TruycapSP();
-    // TẠO HÓA ĐƠN
-    public boolean taoHoaDon(String maHD, String maSP, int soLuongMua, String hinhThucThanhToan) {
+    private final TruycapHoaDon truycapHD = new TruycapHoaDon();
+    private final TruycapSP truycapSP = new TruycapSP();
+
+    // SỬA LẠI: Hàm tạo hóa đơn tương thích hoàn toàn cấu trúc Database hoadon của bạn
+    public boolean taoHoaDon(String maHD, String maNV, String maKH, String maSP, int soLuongMua, String hinhThucThanhToan) {
 
         // 1. Kiểm tra sản phẩm có tồn tại không
         Sanpham sp = truycapSP.getSanphamByMa(maSP);
@@ -29,35 +28,50 @@ private final TruycapSP truycapSP = new TruycapSP();
             return false;
         }
 
-        // 3. Kiểm tra sản phẩm hết hạn
-        if (sp.isHetHan()) {
+        // 3. Kiểm tra sản phẩm hết hạn sử dụng (giả định sp có phương thức isHetHan hoặc tự kiểm tra ngày)
+        if (sp.getNgayHetHan() != null && sp.getNgayHetHan().isBefore(LocalDate.now())) {
             System.out.println("Lỗi: Sản phẩm đã hết hạn sử dụng!");
             return false;
         }
 
-        // 4. Tạo hóa đơn
-        HoaDon hd = new HoaDon(maHD, maSP, sp.getTenSP(), soLuongMua, sp.getGiaBan(), LocalDate.now());
+        // Tính tổng tiền phiên mua = số lượng * giá bán
+        double tongTien = soLuongMua * sp.getGiaBan();
+
+        // 4. Khởi tạo đối tượng HoaDon đúng cấu trúc setter/getter ứng với database thực tế
+        HoaDon hd = new HoaDon();
+        hd.setMaHD(maHD);
+        hd.setMaNV(maNV != null ? maNV : "NV001"); // Mặc định nếu trống
+        hd.setMaKH(maKH != null ? maKH : "KH_LE"); // Khách lẻ mặc định nếu trống
+        hd.setNgayTao(LocalDate.now());
+        hd.setTongTien(tongTien);
+        hd.setTrangThai("Đã thanh toán");
+        hd.setGhiChu("Mua sản phẩm: " + sp.getTenSP() + " | Số lượng: " + soLuongMua + " | HTTT: " + hinhThucThanhToan);
+
+        // Lưu xuống Database bảng hoadon
         boolean taoThanhCong = truycapHD.themHoaDon(hd);
 
-        // 5. Cập nhật tồn kho sau khi bán
+        // 5. Cập nhật trừ lượng tồn kho sản phẩm sau khi xuất hóa đơn thành công
         if (taoThanhCong) {
             sp.setSoLuong(sp.getSoLuong() - soLuongMua);
-            truycapSP.suaSanpham(sp);
+            truycapSP.suaSanpham(sp); // Gọi xuống hàm sửa của dữ liệu sản phẩm
+            System.out.println("Tạo hóa đơn thành công. Đã cập nhật tồn kho mới: " + sp.getSoLuong());
         }
 
         return taoThanhCong;
     }
 
-    //  TÍNH TIỀN TRẢ LẠI 
+    // TÍNH TIỀN TRẢ LẠI 
     public double tinhTienTraLai(double tongTien, double tienKhachDua) {
-        if (tienKhachDua < tongTien) return -1; // báo hiệu không đủ tiền
+        if (tienKhachDua < tongTien) return -1; // Báo hiệu khách đưa thiếu tiền
         return tienKhachDua - tongTien;
     }
 
-    //  KIỂM TRA HÌNH THỨC THANH TOÁN 
+    // KIỂM TRA HÌNH THỨC THANH TOÁN 
     public boolean kiemTraHinhThucThanhToan(String hinhThuc) {
         return hinhThuc.equalsIgnoreCase("tien mat")
-            || hinhThuc.equalsIgnoreCase("chuyen khoan");
+            || hinhThuc.equalsIgnoreCase("chuyen khoan")
+            || hinhThuc.equalsIgnoreCase("tiền mặt")
+            || hinhThuc.equalsIgnoreCase("chuyển khoản");
     }
 
     // LẤY DANH SÁCH HÓA ĐƠN TRONG NGÀY 
@@ -65,7 +79,7 @@ private final TruycapSP truycapSP = new TruycapSP();
         return truycapHD.getHoaDonTheoNgay(ngay);
     }
 
-    //  LẤY TỔNG DOANH THU TRONG NGÀY 
+    // LẤY TỔNG DOANH THU TRONG NGÀY 
     public double getDoanhThuTrongNgay(LocalDate ngay) {
         return truycapHD.getTongDoanhThuTheoNgay(ngay);
     }
