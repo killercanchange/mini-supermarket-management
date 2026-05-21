@@ -32,7 +32,7 @@ public class TruycapHoaDon {
         return danhSach;
     }
 
-    // ============ TÌM THEO MÃ HĐ ============
+    // TÌM THEO MÃ HĐ 
     public HoaDon getHoaDonByMa(String maHD) {
         String sql = "SELECT * FROM hoadon WHERE maHD = ?";
         try (Connection con = DBConnection.getConnection();
@@ -44,7 +44,7 @@ public class TruycapHoaDon {
         return null;
     }
 
-    // ============ LẤY HÓA ĐƠN THEO NGÀY ============
+    //  LẤY HÓA ĐƠN THEO NGÀY 
     public List<HoaDon> getHoaDonTheoNgay(java.time.LocalDate ngay) {
         List<HoaDon> danhSach = new ArrayList<>();
         String sql = "SELECT * FROM hoadon WHERE ngayLap = ?";
@@ -57,7 +57,7 @@ public class TruycapHoaDon {
         return danhSach;
     }
 
-    // ============ THÊM HÓA ĐƠN ============
+    //  THÊM HÓA ĐƠN 
     public boolean themHoaDon(HoaDon hd) {
         String sql = "INSERT INTO hoadon (maHD, maSP, tenSP, soLuongMua, giaBan, tongTien, ngayLap) "
                    + "VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -75,7 +75,7 @@ public class TruycapHoaDon {
         return false;
     }
 
-    // ============ SỬA HÓA ĐƠN ============
+    //  SỬA HÓA ĐƠN 
     public boolean suaHoaDon(HoaDon hd) {
         String sql = "UPDATE hoadon SET maSP=?, tenSP=?, soLuongMua=?, giaBan=?, tongTien=?, ngayLap=? WHERE maHD=?";
         try (Connection con = DBConnection.getConnection();
@@ -92,7 +92,7 @@ public class TruycapHoaDon {
         return false;
     }
 
-    // ============ XÓA HÓA ĐƠN ============
+    //  XÓA HÓA ĐƠN 
     public boolean xoaHoaDon(String maHD) {
         String sql = "DELETE FROM hoadon WHERE maHD = ?";
         try (Connection con = DBConnection.getConnection();
@@ -103,7 +103,7 @@ public class TruycapHoaDon {
         return false;
     }
 
-    // ============ TÍNH TỔNG DOANH THU THEO NGÀY ============
+    //  TÍNH TỔNG DOANH THU THEO NGÀY 
     public double getTongDoanhThuTheoNgay(java.time.LocalDate ngay) {
         String sql = "SELECT SUM(tongTien) FROM hoadon WHERE ngayLap = ?";
         try (Connection con = DBConnection.getConnection();
@@ -115,7 +115,7 @@ public class TruycapHoaDon {
         return 0;
     }
 
-    // ============ TÍNH TỔNG DOANH THU THEO THÁNG ============
+    // ============ TÍNH TỔNG DOANH THU THEO THÁNG 
     public double getTongDoanhThuTheoThang(int thang, int nam) {
         String sql = "SELECT SUM(tongTien) FROM hoadon WHERE MONTH(ngayLap) = ? AND YEAR(ngayLap) = ?";
         try (Connection con = DBConnection.getConnection();
