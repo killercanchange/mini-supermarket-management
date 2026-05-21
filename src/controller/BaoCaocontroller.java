@@ -49,7 +49,7 @@ public class BaoCaocontroller {
         return ketQua;
     }
 
-    //HÀNG TỒN KHO CẦN NHẬP (dưới ngưỡng tối thiểu)
+    //Hang ton kho can nhap
     public List<Sanpham> getHangCanNhap() {
         List<Sanpham> tatCaSP = truycapSP.getAllSanpham();
         List<Sanpham> hangCanNhap = new ArrayList<>();
@@ -59,7 +59,7 @@ public class BaoCaocontroller {
         return hangCanNhap;
     }
 
-    //  HÀNG SẮP HẾT HẠN (trong vòng 30 ngày) 
+    //  Hang sap het han (30 ngay)
     public List<Sanpham> getHangSapHetHan() {
         List<Sanpham> tatCaSP = truycapSP.getAllSanpham();
         List<Sanpham> sapHetHan = new ArrayList<>();

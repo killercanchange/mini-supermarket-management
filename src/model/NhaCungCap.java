@@ -64,7 +64,7 @@ public class NhaCungCap {
         this.email = email;
     }
 
-    // PHƯƠNG THỨC TO STRING
+
 
     @Override
     public String toString() {
