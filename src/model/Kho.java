@@ -21,7 +21,6 @@ public class Kho {
     }
 
     // GETTER & SETTER
-
     public String getMaKho() { return maKho; }
     public void setMaKho(String maKho) { this.maKho = maKho; }
 
