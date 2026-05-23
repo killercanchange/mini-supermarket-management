@@ -2,8 +2,8 @@ package view;
 
 
 
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
 
 
 public class Login extends JFrame {
