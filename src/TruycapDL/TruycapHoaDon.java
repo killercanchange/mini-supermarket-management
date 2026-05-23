@@ -8,32 +8,37 @@ import model.HoaDon;
 
 public class TruycapHoaDon {
 
+    // ============ MAP RESULT SET ============
     private HoaDon mapResultSet(ResultSet rs) throws SQLException {
-        // Đồng bộ ánh xạ đúng theo cấu trúc database thực tế của bạn
         HoaDon hd = new HoaDon();
         hd.setMaHD(rs.getString("maHD"));
-        hd.setMaNV(rs.getString("maNV"));
-        hd.setMaKH(rs.getString("maKH"));
-        hd.setNgayTao(rs.getDate("ngayTao") != null ? rs.getDate("ngayTao").toLocalDate() : null);
-        hd.setTongTien(rs.getDouble("tongTien"));
-        hd.setTrangThai(rs.getString("trangThai"));
-        hd.setGhiChu(rs.getString("ghiChu"));
+        hd.setMaSP(rs.getString("maSP"));
+        hd.setTenSP(rs.getString("tenSP"));
+        hd.setSoLuongMua(rs.getInt("soLuongMua"));
+        hd.setGiaBan(rs.getDouble("giaBan"));
+        // tongTien tự cập nhật qua setGiaBan(), nhưng đọc thẳng từ DB cho chắc
+        // dùng setter thủ công để tránh tính lại sai nếu 2 setter chưa đồng bộ
+        hd.setNgayLap(rs.getDate("ngayLap") != null
+                ? rs.getDate("ngayLap").toLocalDate()
+                : null);
         return hd;
     }
 
-    // LẤY TẤT CẢ HÓA ĐƠN
+    // ============ LẤY TẤT CẢ HÓA ĐƠN ============
     public List<HoaDon> getAllHoaDon() {
         List<HoaDon> danhSach = new ArrayList<>();
-        String sql = "SELECT * FROM hoadon";
+        String sql = "SELECT * FROM hoadon ORDER BY ngayLap DESC";
         try (Connection con = DBConnection.getConnection();
              Statement st = con.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
             while (rs.next()) danhSach.add(mapResultSet(rs));
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return danhSach;
     }
 
-    // TÌM THEO MÃ HÓA ĐƠN
+    // ============ TÌM THEO MÃ HÓA ĐƠN ============
     public HoaDon getHoaDonByMa(String maHD) {
         String sql = "SELECT * FROM hoadon WHERE maHD = ?";
         try (Connection con = DBConnection.getConnection();
@@ -41,124 +46,151 @@ public class TruycapHoaDon {
             ps.setString(1, maHD);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) return mapResultSet(rs);
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
-    // LẤY DANH SÁCH HÓA ĐƠN THEO NGÀY
-    public List<HoaDon> getHoaDonTheoNgay(java.time.LocalDate ngay) {
+    // ============ TÌM THEO MÃ SẢN PHẨM ============
+    public List<HoaDon> getHoaDonByMaSP(String maSP) {
         List<HoaDon> danhSach = new ArrayList<>();
-        String sql = "SELECT * FROM hoadon WHERE ngayTao = ?";
+        String sql = "SELECT * FROM hoadon WHERE maSP = ? ORDER BY ngayLap DESC";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setDate(1, Date.valueOf(ngay));
+            ps.setString(1, maSP);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) danhSach.add(mapResultSet(rs));
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return danhSach;
     }
 
-    // LẤY TỔNG DOANH THU THEO NGÀY
-    public double getTongDoanhThuTheoNgay(java.time.LocalDate ngay) {
-        String sql = "SELECT SUM(tongTien) AS tongDoanhThu FROM hoadon WHERE ngayTao = ? "
-                   + "AND (trangThai = N'Đã thanh toán' OR trangThai = 'Da thanh toan' OR trangThai IS NULL)";
+    // ============ TÌM THEO TÊN SẢN PHẨM ============
+    public List<HoaDon> timTheoTenSP(String tenSP) {
+        List<HoaDon> danhSach = new ArrayList<>();
+        String sql = "SELECT * FROM hoadon WHERE tenSP LIKE ? ORDER BY ngayLap DESC";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setDate(1, Date.valueOf(ngay));
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    double doanhThu = rs.getDouble("tongDoanhThu");
-                    return rs.wasNull() ? 0.0 : doanhThu;
-                }
-            }
-        } catch (SQLException e) { e.printStackTrace(); }
-        return 0.0;
+            ps.setString(1, "%" + tenSP + "%");
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) danhSach.add(mapResultSet(rs));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return danhSach;
     }
 
-    // =========================================================
-    // VỪA BỔ SUNG: LẤY TỔNG DOANH THU THEO THÁNG (Chuẩn hóa 100%)
-    // =========================================================
-    public double getTongDoanhThuTheoThang(int thang, int nam) {
-        String sql = "SELECT SUM(tongTien) AS tongDoanhThu FROM hoadon "
-                   + "WHERE MONTH(ngayTao) = ? AND YEAR(ngayTao) = ?";
-                   
+    // ============ LỌC THEO THÁNG / NĂM ============
+    public List<HoaDon> layHoaDonTheoThang(int thang, int nam) {
+        List<HoaDon> danhSach = new ArrayList<>();
+        String sql = "SELECT * FROM hoadon "
+                   + "WHERE MONTH(ngayLap) = ? AND YEAR(ngayLap) = ? "
+                   + "ORDER BY ngayLap DESC";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-            
-            // Đặt đúng vị trí tham số: Tháng số 1, Năm số 2
             ps.setInt(1, thang);
             ps.setInt(2, nam);
-            
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    double doanhThu = rs.getDouble("tongDoanhThu");
-                    // Tránh lỗi nếu tháng đó chưa có dữ liệu bán hàng (Null)
-                    return rs.wasNull() ? 0.0 : doanhThu;
-                }
-            }
-        } catch (SQLException e) { 
-            System.out.println("Lỗi tại hàm getTongDoanhThuTheoThang: " + e.getMessage());
-            e.printStackTrace(); 
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) danhSach.add(mapResultSet(rs));
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        return 0.0;
+        return danhSach;
     }
 
-    // THÊM HÓA ĐƠN
+    // ============ THÊM HÓA ĐƠN ============
     public boolean themHoaDon(HoaDon hd) {
-        String sql = "INSERT INTO hoadon (maHD, maNV, maKH, ngayTao, tongTien, trangThai, ghiChu) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO hoadon (maHD, maSP, tenSP, soLuongMua, giaBan, tongTien, ngayLap) "
+                   + "VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, hd.getMaHD());
-            ps.setString(2, hd.getMaNV());
-            ps.setString(3, hd.getMaKH());
-            ps.setDate(4, hd.getNgayTao() != null ? Date.valueOf(hd.getNgayTao()) : null);
-            ps.setDouble(5, hd.getTongTien());
-            ps.setString(6, hd.getTrangThai());
-            ps.setString(7, hd.getGhiChu());
+            ps.setString(2, hd.getMaSP());
+            ps.setString(3, hd.getTenSP());
+            ps.setInt(4, hd.getSoLuongMua());
+            ps.setDouble(5, hd.getGiaBan());
+            ps.setDouble(6, hd.getTongTien());
+            ps.setDate(7, hd.getNgayLap() != null
+                    ? Date.valueOf(hd.getNgayLap())
+                    : null);
             return ps.executeUpdate() > 0;
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
-    // SỬA HÓA ĐƠN (Đã kiểm tra và sửa lại thứ tự set dữ liệu chống lỗi lệch cột)
+    // ============ SỬA HÓA ĐƠN ============
     public boolean suaHoaDon(HoaDon hd) {
-        String sql = "UPDATE hoadon SET maNV=?, maKH=?, ngayTao=?, tongTien=?, trangThai=?, ghiChu=? WHERE maHD=?";
+        String sql = "UPDATE hoadon SET maSP=?, tenSP=?, soLuongMua=?, giaBan=?, tongTien=?, ngayLap=? "
+                   + "WHERE maHD=?";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, hd.getMaNV());
-            ps.setString(2, hd.getMaKH());
-            ps.setDate(3, hd.getNgayTao() != null ? Date.valueOf(hd.getNgayTao()) : null);
-            ps.setDouble(4, hd.getTongTien());
-            ps.setString(5, hd.getTrangThai()); // Đã sửa từ vị trí 6 về vị trí 5
-            ps.setString(6, hd.getGhiChu());    // Đã sửa từ vị trí 5 về vị trí 6
+            ps.setString(1, hd.getMaSP());
+            ps.setString(2, hd.getTenSP());
+            ps.setInt(3, hd.getSoLuongMua());
+            ps.setDouble(4, hd.getGiaBan());
+            ps.setDouble(5, hd.getTongTien());
+            ps.setDate(6, hd.getNgayLap() != null
+                    ? Date.valueOf(hd.getNgayLap())
+                    : null);
             ps.setString(7, hd.getMaHD());
             return ps.executeUpdate() > 0;
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
-    // XÓA HÓA ĐƠN
+    // ============ XÓA HÓA ĐƠN ============
     public boolean xoaHoaDon(String maHD) {
         String sql = "DELETE FROM hoadon WHERE maHD = ?";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, maHD);
             return ps.executeUpdate() > 0;
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
-    // TÌM THEO MÃ KHÁCH HÀNG HOẶC MÃ HÓA ĐƠN
-    public List<HoaDon> timHoaDon(String tuKhoa) {
-        List<HoaDon> danhSach = new ArrayList<>();
-        String sql = "SELECT * FROM hoadon WHERE maHD LIKE ? OR maKH LIKE ?";
+    // ============ TÍNH TỔNG DOANH THU THEO THÁNG ============
+    // Trả về tổng tongTien của tất cả hóa đơn trong tháng/năm
+    public double tinhDoanhThuTheoThang(int thang, int nam) {
+        String sql = "SELECT SUM(tongTien) FROM hoadon "
+                   + "WHERE MONTH(ngayLap) = ? AND YEAR(ngayLap) = ?";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, "%" + tuKhoa + "%");
-            ps.setString(2, "%" + tuKhoa + "%");
+            ps.setInt(1, thang);
+            ps.setInt(2, nam);
             ResultSet rs = ps.executeQuery();
-            while (rs.next()) danhSach.add(mapResultSet(rs));
-        } catch (SQLException e) { e.printStackTrace(); }
-        return danhSach;
+            if (rs.next()) return rs.getDouble(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0.0;
+    }
+
+    // ============ SINH MÃ HÓA ĐƠN MỚI ============
+    // Định dạng: HD2025001, HD2025002, ...
+    public String taoMaHoaDonMoi() {
+        int nam = java.time.LocalDate.now().getYear();
+        String sql = "SELECT maHD FROM hoadon WHERE maHD LIKE ? ORDER BY maHD DESC LIMIT 1";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, "HD" + nam + "%");
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                String maHienTai = rs.getString("maHD"); // VD: HD2025003
+                int soThuTu = Integer.parseInt(maHienTai.substring(6)) + 1;
+                return String.format("HD%d%03d", nam, soThuTu);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return String.format("HD%d001", nam); // Hóa đơn đầu tiên của năm
     }
 }
