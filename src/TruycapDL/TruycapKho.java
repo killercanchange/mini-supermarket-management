@@ -8,7 +8,6 @@ import model.Kho;
 
 public class TruycapKho {
 
-    // ============ MAP RESULT SET ============
     private Kho mapResultSet(ResultSet rs) throws SQLException {
         Kho kho = new Kho();
         kho.setMaKho(rs.getString("maKho"));
@@ -19,7 +18,6 @@ public class TruycapKho {
         return kho;
     }
 
-    // ============ LẤY TẤT CẢ KHO ============
     public List<Kho> getAllKho() {
         List<Kho> danhSach = new ArrayList<>();
         String sql = "SELECT * FROM kho";
@@ -33,7 +31,6 @@ public class TruycapKho {
         return danhSach;
     }
 
-    // ============ TÌM THEO MÃ KHO ============
     public Kho getKhoByMa(String maKho) {
         String sql = "SELECT * FROM kho WHERE maKho = ?";
         try (Connection con = DBConnection.getConnection();
@@ -47,7 +44,6 @@ public class TruycapKho {
         return null;
     }
 
-    // ============ TÌM THEO TÊN KHO ============
     public List<Kho> timTheoTenKho(String tenKho) {
         List<Kho> danhSach = new ArrayList<>();
         String sql = "SELECT * FROM kho WHERE tenKho LIKE ?";
@@ -62,10 +58,8 @@ public class TruycapKho {
         return danhSach;
     }
 
-    // ============ THÊM KHO ============
     public boolean themKho(Kho kho) {
-        String sql = "INSERT INTO kho (maKho, tenKho, diachi, sucChua, ghiChu) "
-                   + "VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO kho (maKho, tenKho, diachi, sucChua, ghiChu) VALUES (?, ?, ?, ?, ?)";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, kho.getMaKho());
@@ -80,7 +74,6 @@ public class TruycapKho {
         return false;
     }
 
-    // ============ SỬA KHO ============
     public boolean suaKho(Kho kho) {
         String sql = "UPDATE kho SET tenKho=?, diachi=?, sucChua=?, ghiChu=? WHERE maKho=?";
         try (Connection con = DBConnection.getConnection();
@@ -97,7 +90,6 @@ public class TruycapKho {
         return false;
     }
 
-    // ============ XÓA KHO ============
     public boolean xoaKho(String maKho) {
         String sql = "DELETE FROM kho WHERE maKho = ?";
         try (Connection con = DBConnection.getConnection();
@@ -110,7 +102,6 @@ public class TruycapKho {
         return false;
     }
 
-    // ============ KIỂM TRA KHO CÒN CHỖ KHÔNG ============
     public boolean kiemTraConCho(String maKho) {
         String sql = "SELECT sucChua FROM kho WHERE maKho = ?";
         try (Connection con = DBConnection.getConnection();
@@ -124,7 +115,6 @@ public class TruycapKho {
         return false;
     }
 
-    // ============ SINH MÃ KHO MỚI ============
     public String taoMaKhoMoi() {
         String sql = "SELECT maKho FROM kho ORDER BY maKho DESC LIMIT 1";
         try (Connection con = DBConnection.getConnection();
