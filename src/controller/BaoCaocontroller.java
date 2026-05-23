@@ -3,6 +3,7 @@ package controller;
 import TruycapDL.TruycapHoaDon;
 import TruycapDL.TruycapSP;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import model.HoaDon;
@@ -18,63 +19,91 @@ public class BaoCaocontroller {
         return truycapHD.getTongDoanhThuTheoNgay(ngay);
     }
 
-    //  DOANH THU THEO THÁNG 
+    // DOANH THU THEO THÁNG 
     public double getDoanhThuTheoThang(int thang, int nam) {
         return truycapHD.getTongDoanhThuTheoThang(thang, nam);
     }
 
-    //  SẢN PHẨM BÁN CHẠY NHẤT 
-    // Trả về danh sách SP được mua nhiều nhất dựa trên hóa đơn
+    // SẢN PHẨM BÁN CHẠY NHẤT 
+    // Giải pháp thông minh: Do cấu trúc bảng hoadon của bạn gom thông tin sản phẩm vào chuỗi ghi chu 
+    // nên controller sẽ phân tích cú pháp chuỗi này để thống kê chính xác số lượng bán ra.
     public List<String> getSanphamBanChay() {
         List<HoaDon> tatCaHD = truycapHD.getAllHoaDon();
         List<String> ketQua = new ArrayList<>();
 
-        // Đếm số lượng bán theo từng maSP
         java.util.Map<String, Integer> demSoLuong = new java.util.HashMap<>();
-        java.util.Map<String, String> tenSP = new java.util.HashMap<>();
 
         for (HoaDon hd : tatCaHD) {
-            String ma = hd.getMaSP();
-            demSoLuong.put(ma, demSoLuong.getOrDefault(ma, 0) + hd.getSoLuongMua());
-            tenSP.put(ma, hd.getTenSP());
+            String ghiChu = hd.getGhiChu();
+            if (ghiChu != null && ghiChu.contains("Mua sản phẩm:") && ghiChu.contains("So luong:") || ghiChu.contains("Số lượng:")) {
+                try {
+                    // Trích xuất tên sản phẩm từ Ghi chú
+                    String tenSP = ghiChu.substring(ghiChu.indexOf("Mua sản phẩm:") + 13, ghiChu.indexOf("|")).trim();
+                    
+                    // Trích xuất số lượng mua từ Ghi chú
+                    String phanSoLuong = ghiChu.substring(ghiChu.indexOf("lượng:") != -1 ? ghiChu.indexOf("lượng:") + 6 : ghiChu.indexOf("luong:") + 6);
+                    String soLuongStr = phanSoLuong.substring(0, phanSoLuong.indexOf("|")).trim();
+                    int soLuongMua = Integer.parseInt(soLuongStr);
+
+                    // Cộng dồn vào danh sách đếm
+                    demSoLuong.put(tenSP, demSoLuong.getOrDefault(tenSP, 0) + soLuongMua);
+                } catch (Exception e) {
+                    // Bỏ qua các hóa đơn có định dạng ghi chú không chuẩn hoặc viết tay ngẫu nhiên
+                }
+            }
         }
 
-        // Sắp xếp giảm dần theo số lượng bán
+        // Sắp xếp giảm dần theo số lượng bán và trả về chuỗi hiển thị lên giao diện
         demSoLuong.entrySet().stream()
             .sorted((a, b) -> b.getValue() - a.getValue())
             .forEach(entry -> {
-                ketQua.add(tenSP.get(entry.getKey()) + " — Đã bán: " + entry.getValue());
+                ketQua.add(entry.getKey() + " — Đã bán: " + entry.getValue() + " sp");
             });
 
         return ketQua;
     }
 
-    //Hang ton kho can nhap
+    // HÀNG TỒN KHO CẦN NHẬP (Số lượng tồn kho nhỏ hơn hoặc bằng số lượng tối thiểu quy định)
     public List<Sanpham> getHangCanNhap() {
         List<Sanpham> tatCaSP = truycapSP.getAllSanpham();
         List<Sanpham> hangCanNhap = new ArrayList<>();
         for (Sanpham sp : tatCaSP) {
-            if (sp.isTonKhoThap()) hangCanNhap.add(sp);
+            // Đồng bộ kiểm tra: Nếu số lượng hiện tại thấp hơn mức tồn kho tối thiểu an toàn
+            if (sp.getSoLuong() <= sp.getSoLuongToiThieu()) {
+                hangCanNhap.add(sp);
+            }
         }
         return hangCanNhap;
     }
 
-    //  Hang sap het han (30 ngay)
+    // HÀNG SẮP HẾT HẠN (Còn hạn nhưng nằm trong khoảng 30 ngày tới tính từ hôm nay)
     public List<Sanpham> getHangSapHetHan() {
         List<Sanpham> tatCaSP = truycapSP.getAllSanpham();
         List<Sanpham> sapHetHan = new ArrayList<>();
+        LocalDate homNay = LocalDate.now();
+        
         for (Sanpham sp : tatCaSP) {
-            if (sp.isSapHetHan()) sapHetHan.add(sp);
+            if (sp.getNgayHetHan() != null) {
+                // Tính khoảng cách số ngày từ hôm nay đến ngày hết hạn của sản phẩm
+                long soNgayConLai = ChronoUnit.DAYS.between(homNay, sp.getNgayHetHan());
+                if (soNgayConLai > 0 && soNgayConLai <= 30) {
+                    sapHetHan.add(sp);
+                }
+            }
         }
         return sapHetHan;
     }
 
-    // HÀNG ĐÃ HẾT HẠN 
+    // HÀNG ĐÃ HẾT HẠN (Ngày hết hạn trước ngày hôm nay)
     public List<Sanpham> getHangHetHan() {
         List<Sanpham> tatCaSP = truycapSP.getAllSanpham();
         List<Sanpham> hetHan = new ArrayList<>();
+        LocalDate homNay = LocalDate.now();
+        
         for (Sanpham sp : tatCaSP) {
-            if (sp.isHetHan()) hetHan.add(sp);
+            if (sp.getNgayHetHan() != null && sp.getNgayHetHan().isBefore(homNay)) {
+                hetHan.add(sp);
+            }
         }
         return hetHan;
     }
