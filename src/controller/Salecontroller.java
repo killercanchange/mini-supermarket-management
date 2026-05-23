@@ -1,3 +1,4 @@
+// code kiểm tra kết nối CSDL, thêm sửa xóa nhân viên, thêm sửa xóa sản phẩm, hiển thị danh sách nhân viên, hiển thị danh sách sản phẩm
 
 package controller;
 
@@ -10,8 +11,9 @@ import model.Sanpham;
 
 public class Salecontroller {
 
-private final TruycapHoaDon truycapHD = new TruycapHoaDon();
-private final TruycapSP truycapSP = new TruycapSP();
+    private final TruycapHoaDon truycapHD = new TruycapHoaDon();
+    private final TruycapSP truycapSP = new TruycapSP();
+
     // TẠO HÓA ĐƠN
     public boolean taoHoaDon(String maHD, String maSP, int soLuongMua, String hinhThucThanhToan) {
 
