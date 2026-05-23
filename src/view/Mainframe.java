@@ -133,7 +133,7 @@ public class Mainframe extends JFrame {
         // =========================================================
         // XỬ LÝ SỰ KIỆN ĐIỀU HƯỚNG MỞ CỬA SỔ (LISTENERS)
         // =========================================================
-        btnQLSanPham.addActionListener(e -> new QuanLySanPham().setVisible(true));
+        btnQLSanPham.addActionListener(e -> new QuanLySP().setVisible(true));
         btnQLKhachHang.addActionListener(e -> new QuanLyKhachHang().setVisible(true));
         btnQLNhanVien.addActionListener(e -> new QuanLyNhanVien().setVisible(true));
         btnQLHoaDon.addActionListener(e -> new QuanLyHoaDon().setVisible(true));

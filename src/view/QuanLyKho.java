@@ -1,9 +1,7 @@
 package view;
 
 import TruycapDL.TruycapKho;
-<<<<<<< HEAD
 import model.Kho;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
@@ -43,8 +41,6 @@ import model.Sanpham;
  */
 public class QuanLyKho extends JFrame {
 
-
-<<<<<<< HEAD
     // ================================================================
     // FIELDS & COMPONENTS
     // ================================================================
@@ -61,7 +57,7 @@ public class QuanLyKho extends JFrame {
     private static final Color COLOR_WARNING   = new Color(241, 196, 15); // Vàng (Sửa)
     private static final Color COLOR_DANGER    = new Color(192, 57, 43);  // Đỏ (Xóa)
     private static final Color COLOR_BG        = new Color(245, 247, 250); // Màu nền nhẹ
-=======
+
     // FIELDS
 
     private TruycapKho truycapKho;
@@ -91,12 +87,11 @@ public class QuanLyKho extends JFrame {
     private JTable            tableHetHan;
     private JComboBox<String> cmbLoaiHetHan;
 
->>>>>>> a122a7f490af7ae9e1ee76a7a274b868b869e597
+
 
     // CONSTRUCTOR
 
     public QuanLyKho() {
-<<<<<<< HEAD
         this.truycapKho = new TruycapKho();
         initComponents();
         loadDataToTable();
